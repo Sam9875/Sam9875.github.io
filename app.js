@@ -1,7 +1,7 @@
 const CONFIG = {
   name: 'Samesun Singh',
   githubProfile: 'https://github.com/Sam9875',
-  linkedin: 'https://www.linkedin.com/in/samesun-singh',
+  linkedin: 'https://www.linkedin.com/in/samesun-singh-979a86275/',
   researchgate: 'https://www.researchgate.net/profile/Samesun-Singh',
   email: 'samesun987@gmail.com',
   phone: '+39 347 665 7332'

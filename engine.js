@@ -26,11 +26,13 @@ function labelSprite(text, color = "#245c50") {
   return sprite;
 }
 function makeRenderer(el) {
-  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, premultipliedAlpha: false });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   renderer.setSize(el.clientWidth, el.clientHeight);
-  renderer.setClearColor(PAPER, 1);
+  renderer.setClearColor(0, 0);
+  renderer.setClearAlpha(0);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
+  el.style.background = PAPER;
   el.appendChild(renderer.domElement);
   renderer.domElement.style.display = "block";
   renderer.domElement.style.width = "100%";
@@ -360,7 +362,7 @@ function populate(scene, kind, nodes, pickables) {
 }
 function mountScene(el, opts) {
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(PAPER);
+  scene.background = null;
   const camera = new THREE.PerspectiveCamera(42, el.clientWidth / Math.max(el.clientHeight, 1), 0.1, 80);
   camera.position.set(0, 1.4, 7.2);
   const renderer = makeRenderer(el);
@@ -372,6 +374,15 @@ function mountScene(el, opts) {
     if (!(child instanceof THREE.Light)) rig.add(child);
   });
   scene.add(rig);
+  const sky = new THREE.Mesh(
+    new THREE.SphereGeometry(16, 24, 16),
+    new THREE.MeshBasicMaterial({
+      color: new THREE.Color().setStyle(PAPER),
+      side: THREE.BackSide,
+      depthWrite: false
+    })
+  );
+  scene.add(sky);
   const bases = /* @__PURE__ */ new Map();
   rig.traverse((obj) => {
     if (obj instanceof THREE.Mesh) bases.set(obj, obj.position.clone());

@@ -1,4 +1,4 @@
-import { mountScene } from "./engine.js?v=20260911c";
+import { mountScene } from "./engine.js?v=20260911d";
 import {
   PROFILE,
   education,

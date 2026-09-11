@@ -88,7 +88,7 @@ function home() {
       <div class="hero-grid">
         <div>
           <p class="kicker">Available for data / AI roles · ${esc(PROFILE.location)}</p>
-          <h1>Work that still ranks when the data is sparse.</h1>
+          <h1>Building systems<br>that <em>learn in production.</em></h1>
           <p class="lede">${esc(PROFILE.name)} — ${esc(PROFILE.role)} at ${esc(PROFILE.school)}. Cold-start news ranking, a 7,800-call fairness audit, and ten original labs on the modern DS/AI stack.</p>
           <div class="actions">
             <a class="btn btn-primary" href="#labs">Orbit the labs</a>

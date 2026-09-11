@@ -1,107 +1,291 @@
-const CONFIG = {
-  name: 'Samesun Singh',
-  githubProfile: 'https://github.com/Sam9875',
-  linkedin: 'https://www.linkedin.com/in/samesun-singh-979a86275/',
-  researchgate: 'https://www.researchgate.net/profile/Samesun-Singh',
-  email: 'samesun987@gmail.com',
-  phone: '+39 347 665 7332'
+import { mountScene } from "./engine.js";
+import {
+  PROFILE,
+  education,
+  experience,
+  languages,
+  projects,
+  skillGroups,
+} from "./data.js";
+
+const CATS = ["All", "Labs", "RecSys", "LLM", "Vision", "NLP", "Systems", "Industry", "Course"];
+const ICON = {
+  gh: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.2c3.5-.4 7-1.6 7-7.2 0-1.6-.6-2.8-1.6-3.8.1-.4.7-1.9-.2-3.8 0 0-1.3-.4-4.2 1.6A14 14 0 0 0 12 4a14 14 0 0 0-3.8.4C5.3 2.4 4 2.8 4 2.8c-.9 1.9-.3 3.4-.2 3.8-1 1-1.6 2.2-1.6 3.8 0 5.6 3.5 6.8 7 7.2a4.8 4.8 0 0 0-1 3.2v4"/><path d="M9 18c-4.5 1.5-4.5-2.5-6-3"/></svg>',
+  mail: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>',
+  phone: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.6a2 2 0 0 1-.4 2.1L8 9.9a16 16 0 0 0 6 6l1.4-1.3a2 2 0 0 1 2.1-.4c.8.3 1.7.5 2.6.6a2 2 0 0 1 1.7 2.1z"/></svg>',
+  pin: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>',
+  in: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>',
+  up: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg>',
+  back: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>',
+  down: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v14"/><path d="m6 13 6 6 6-6"/><path d="M4 21h16"/></svg>',
 };
 
-const featured = [
-  {id:'langgraph',n:'01',title:'AI Agent with LangGraph',stars:'41.1k',blurb:'Stateful multi-step agents as graphs: reason, tool, reflect, memory.',tags:['LangGraph','Agents','Python'],github:'https://github.com/langchain-ai/langgraph',stack:'LangGraph / LangChain / tools / checkpointer',arch:[['User goal','intent'],['Graph state','messages'],['Reason','LLM plan'],['Tool node','APIs'],['Reflect','retry/stop'],['Response','answer']]},
-  {id:'rag',n:'02',title:'RAG from scratch',stars:'9.3k',blurb:'Chunk, embed, retrieve, rerank, then ground the LLM in citations.',tags:['RAG','Embeddings','LangChain'],github:'https://github.com/langchain-ai/rag-from-scratch',stack:'chunk / embed / index / rerank / generate',arch:[['Corpus','docs'],['Chunk+embed','metadata'],['Vector store','ANN'],['Retrieve','top-k'],['Rerank','cross-enc'],['Generate','+sources']]},
-  {id:'promptfoo',n:'03',title:'LLM evaluations with Promptfoo',stars:'24.8k',blurb:'Prompts as code: fixtures, providers, assertions, CI scoreboard.',tags:['Evals','Promptfoo','QA'],github:'https://github.com/promptfoo/promptfoo',stack:'promptfoo / providers / rubric / CI',arch:[['Tests','inputs'],['Providers','models'],['Run','parallel'],['Assert','rubric'],['Scores','cost/lat'],['CI gate','block']]},
-  {id:'unsloth',n:'04',title:'Fine-tune an LLM with LoRA',stars:'75.6k',blurb:'QLoRA on one GPU with Unsloth. Train adapters, merge, export GGUF.',tags:['LoRA','Unsloth','Fine-tune'],github:'https://github.com/unslothai/unsloth',stack:'Unsloth / PEFT / bitsandbytes / GGUF',arch:[['Base LLM','weights'],['4-bit load','memory'],['LoRA','adapters'],['Train','SFT/DPO'],['Merge','full'],['Export','GGUF']]},
-  {id:'mcp',n:'05',title:'Build an MCP server',stars:'90.1k',blurb:'Tools, resources and prompts over MCP so any host can call your data.',tags:['MCP','Tools','Protocol'],github:'https://github.com/modelcontextprotocol/servers',stack:'MCP SDK / stdio SSE / tools / auth',arch:[['Host','Claude/Cursor'],['Client','schema'],['Server','process'],['Tools','JSON'],['Resources','files/DB'],['Systems','APIs']]},
-  {id:'gemini',n:'06',title:'Multimodal app with Gemini',stars:'17.7k',blurb:'Text, image, audio and video with function calling.',tags:['Gemini','Multimodal','Apps'],github:'https://github.com/google-gemini/cookbook',stack:'Gemini API / parts / tools / UI',arch:[['Inputs','multi'],['App','session'],['Gemini','generate'],['Tools','calls'],['Filter','safety'],['Output','media']]},
-  {id:'qdrant',n:'07',title:'Semantic search with vector DBs',stars:'34.4k',blurb:'Qdrant collections, payload filters, hybrid sparse+dense ANN.',tags:['Qdrant','ANN','Search'],github:'https://github.com/qdrant/qdrant',stack:'Qdrant / dense-sparse / filters',arch:[['Docs','ingest'],['Embed','vectors'],['Collection','HNSW'],['Query','embed'],['Search','ANN'],['Hits','UI/RAG']]},
-  {id:'openhands',n:'08',title:'AI coding agent with OpenHands',stars:'86.2k',blurb:'Agent that writes, runs and fixes code in a sandbox.',tags:['OpenHands','Code agent','Sandbox'],github:'https://github.com/OpenHands/OpenHands',stack:'OpenHands / sandbox / LLM / git',arch:[['Task','issue'],['Plan','steps'],['Edit','files'],['Runtime','tests'],['Observe','logs'],['Ship','PR']]},
-  {id:'mlops',n:'09',title:'End-to-end MLOps',stars:'49.4k',blurb:'Notebook to production: train, eval, register, serve, monitor.',tags:['MLOps','Registry','Serving'],github:'https://github.com/GokuMohandas/Made-With-ML',stack:'MLflow / registry / API / monitor',arch:[['Data','versioned'],['Train','tracking'],['Eval','slices'],['Registry','stage'],['Serve','API'],['Monitor','drift']]},
-  {id:'reco',n:'10',title:'Recommendation system',stars:'21.9k',blurb:'Microsoft Recommenders: candidates, ranking, offline/online eval.',tags:['RecSys','Ranking','Microsoft'],github:'https://github.com/recommenders-team/recommenders',stack:'two-tower / LTR / metrics',arch:[['Events','user-item'],['Candidates','recall'],['Features','context'],['Ranker','LTR'],['Rules','diversity'],['Serve','top-N']]}
-];
+let sceneDispose = null;
+let filter = "All";
 
-const own = [
-  {id:'coldstart',title:'Cold-start recommender',org:'Thesis / Column news',blurb:'Recommender for new users and items in sparse interaction data.',tags:['RecSys','Cold start','Python'],github:'https://github.com/Sam9875/Two-Tower-thesis',stack:'two-tower / content / ranking metrics',arch:[['Users/items','sparse'],['Content','embeddings'],['Warm CF','where possible'],['Cold','priors'],['Hybrid','blend'],['Eval','nDCG']]},
-  {id:'stellantis',title:'Vehicle breakdown risk',org:'Research student / Stellantis',blurb:'1M+ service logs, warranty claims and sensors. CatBoost, LightGBM, RF.',tags:['CatBoost','LightGBM','Pipelines'],github:null,stack:'pandas/Spark / GBDT / calibration',arch:[['Logs','sensors'],['Clean','units'],['Features','usage'],['Models','GBDT'],['Compare','PR-AUC'],['Score','ops']]},
-  {id:'hospital',title:'Post-operative risk models',org:'LINKS Foundation and Molinette',blurb:'Complications and nosocomial infection risk for ENT oncology patients.',tags:['Healthcare ML','Risk','SHAP'],github:null,stack:'XGBoost / SHAP / temporal split',arch:[['EHR','cohort'],['Features','labs'],['Train','XGB'],['Explain','SHAP'],['Validate','time'],['Flags','clinic']]},
-  {id:'ego4d',title:'Egocentric NLQ + VideoQA',org:'Politecnico di Torino',blurb:'VSLBase/VSLNet on Ego4D plus Video-LLaVA QA (BLEU/ROUGE).',tags:['Video','NLQ','Video-LLaVA'],github:'https://github.com/Sam9875/Egocentric_VIsion',stack:'Ego4D / Omnivore / EgoVLP / VSLNet',arch:[['Video','Ego4D'],['Encode','Omnivore'],['Query','NLQ'],['Span','VSLNet'],['QA','LLaVA'],['Metrics','IoU']]},
-  {id:'age',title:'Age from speech',org:'Politecnico di Torino',blurb:'Regression from linguistic and acoustic features of spoken sentences.',tags:['Speech','Regression'],github:null,stack:'acoustic + linguistic / sklearn',arch:[['Audio','speech'],['Acoustic','prosody'],['Linguistic','lexicon'],['Models','regress'],['Select','MAE'],['Age','bands']]},
-  {id:'os',title:'Microkernel vs monolithic OS',org:'Publication / Dec 2023',blurb:'OS architecture vs functional safety, reliability and fault isolation.',tags:['OS','Safety','Paper'],github:null,paper:'https://www.researchgate.net/profile/Samesun-Singh',stack:'fault models / isolation / latency',arch:[['Workloads','safety'],['Monolithic','shared'],['Microkernel','servers'],['Faults','crash'],['Props','isolation'],['Report','tradeoff']]},
-  {id:'column-demo',title:'Column news demo',org:'Thesis product / Column news',blurb:'Demo client for the Column recommendation stack (v3 / v4).',tags:['RecSys','Product','JavaScript'],github:'https://github.com/Sam9875/Column-Demo-apk',stack:'two-tower / ranking API / demo UI',arch:[['Session','user'],['Candidates','MIND'],['Rank','v3/v4'],['App','feed'],['Feedback','clicks'],['Loop','eval']]},
-  {id:'tenant-bias',title:'Tenant-bias LLM audit',org:'Research / Turin rental screening',blurb:'5 listings x 480 synthetic applicants. Owl-alpha and Qwen.',tags:['LLM eval','Fairness','Python'],github:'https://github.com/Sam9875/Tenant-bias-LLM',stack:'Owl-alpha / Qwen / slice metrics',arch:[['Listings','Turin'],['Profiles','480'],['LLM','screener'],['Scores','rank'],['Slices','gaps'],['Report','bias']]},
-  {id:'mind',title:'MIND large two-tower',org:'Column / news recommendation',blurb:'Two-tower training on MIND Large for news ranking.',tags:['MIND','Two-tower','News'],github:'https://github.com/Sam9875/MIND-large-column',stack:'MIND Large / two-tower / retrieval',arch:[['MIND','news'],['Users','history'],['Towers','user/item'],['Train','contrastive'],['Retrieve','ANN'],['Rank','news']]}
-];
-
-function escapeXml(s) {
-  return String(s).replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>');
+function esc(s) {
+  return String(s ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/"/g, "&quot;");
 }
 
-function svgArch(steps) {
-  var w = 820, h = 210, n = steps.length, boxW = 112, gap = (w - n * boxW) / (n + 1), y = 70;
-  var boxes = '', arrows = '', i, x, title, sub;
-  for (i = 0; i < n; i++) {
-    title = steps[i][0];
-    sub = steps[i][1];
-    x = gap + i * (boxW + gap);
-    boxes += '<rect class="node' + (i === 0 || i === n - 1 ? ' node-accent' : '') + '" x="' + x + '" y="' + y + '" width="' + boxW + '" height="64" rx="12"/>';
-    boxes += '<text class="label" x="' + (x + boxW / 2) + '" y="' + (y + 28) + '" text-anchor="middle">' + escapeXml(title) + '</text>';
-    boxes += '<text class="sub" x="' + (x + boxW / 2) + '" y="' + (y + 46) + '" text-anchor="middle">' + escapeXml(sub) + '</text>';
-    if (i < n - 1) {
-      arrows += '<line class="flow" x1="' + (x + boxW + 4) + '" y1="' + (y + 32) + '" x2="' + (x + boxW + gap - 4) + '" y2="' + (y + 32) + '"/>';
-    }
+function labs() {
+  return projects.filter((p) => p.lab);
+}
+function publicCount() {
+  return projects.filter((p) => p.repo && !p.private).length;
+}
+
+function header() {
+  return `<header class="nav"><div class="wrap nav-inner">
+    <a class="brand" href="#/">
+      <span class="mark">SS</span>
+      <span class="brand-name">${esc(PROFILE.name)}</span>
+    </a>
+    <nav class="nav-links">
+      <a class="mobile" href="#work">Work</a>
+      <a href="#labs">Labs</a>
+      <a href="#work">Work</a>
+      <a href="#experience">Experience</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+      <a class="btn btn-outline btn-sm" href="Samesun_Singh_CV_EN.pdf" download>${ICON.down} CV</a>
+    </nav>
+  </div></header>`;
+}
+
+function footer() {
+  return `<footer><div class="wrap foot">
+    <p>${esc(PROFILE.name)} · ${esc(PROFILE.location)}</p>
+    <p>Every public GitHub repo, rewritten — plus the closed one, named only.</p>
+  </div></footer>`;
+}
+
+function card(p) {
+  const gh = p.github
+    ? `<a href="${esc(p.github)}" target="_blank" rel="noopener">GitHub</a>`
+    : p.private
+      ? `<span class="muted">Private repo</span>`
+      : p.paper
+        ? `<a href="${esc(p.paper)}" target="_blank" rel="noopener">Paper</a>`
+        : "";
+  return `<article class="card">
+    <div class="card-meta"><span>${esc(p.category)}</span><span>${p.private ? "Private · " : ""}${esc(p.year)}</span></div>
+    <h3><a href="#/work/${esc(p.slug)}">${esc(p.title)}</a></h3>
+    <p class="blurb">${esc(p.blurb)}</p>
+    <p class="delta"><span class="lbl">New · </span>${esc(p.whatsNew[0] || "")}</p>
+    <div class="tags">${(p.tags || []).slice(0, 3).map((t) => `<span class="tag">${esc(t)}</span>`).join("")}</div>
+    <div class="card-links">
+      <a class="arch" href="#/work/${esc(p.slug)}">Architecture ${ICON.up}</a>
+      ${gh}
+    </div>
+  </article>`;
+}
+
+function home() {
+  const vis = visible();
+  const labList = labs();
+  return `<main>
+    <section class="hero wrap">
+      <div class="hero-grid">
+        <div>
+          <p class="kicker">Available for data / AI roles · ${esc(PROFILE.location)}</p>
+          <h1>Work that still ranks when the data is sparse.</h1>
+          <p class="lede">${esc(PROFILE.name)} — ${esc(PROFILE.role)} at ${esc(PROFILE.school)}. Cold-start news ranking, a 7,800-call fairness audit, and ten original labs on the modern DS/AI stack.</p>
+          <div class="actions">
+            <a class="btn btn-primary" href="#labs">Orbit the labs</a>
+            <a class="btn btn-outline" href="${esc(PROFILE.github)}" target="_blank" rel="noopener">${ICON.gh} GitHub</a>
+            <a class="btn btn-ghost" href="Samesun_Singh_CV_EN.pdf" download>Download CV</a>
+          </div>
+        </div>
+        <div class="scene" data-kind="constellation">
+          <div class="scene-host"></div>
+          <p class="scene-cap">Drag to orbit · click a node</p>
+        </div>
+      </div>
+      <dl class="stats">
+        <div class="stat"><dt>Public GitHub repos</dt><dd>${publicCount()}</dd></div>
+        <div class="stat"><dt>DS/AI labs</dt><dd>${labList.length}</dd></div>
+        <div class="stat"><dt>LLM audit calls</dt><dd>7,800</dd></div>
+        <div class="stat"><dt>Stellantis logs</dt><dd>1M+</dd></div>
+      </dl>
+    </section>
+
+    <section id="about" class="section"><div class="wrap section-grid">
+      <div><h2>About</h2><p class="muted mt-3">Italian and English. Messy data on purpose.</p></div>
+      <div>
+        <p>${esc(PROFILE.summary)}</p>
+        <div class="skills mt-8">${skillGroups.map((g) => `<div><p class="kicker">${esc(g.group)}</p><p class="muted mt-2">${esc(g.items.join(" · "))}</p></div>`).join("")}</div>
+        <p class="kicker mt-8">Languages</p>
+        <p class="muted mt-2">${languages.map((l) => `${esc(l.name)} ${esc(l.level)}`).join(" · ")}</p>
+      </div>
+    </div></section>
+
+    <section id="experience" class="section"><div class="wrap section-grid">
+      <div><h2>Experience</h2><p class="muted mt-3">Industry labs, then a product thesis.</p></div>
+      <div>
+        ${experience.map((job) => `<article class="job">
+          <p class="muted" style="font-family:var(--font-mono);font-size:0.75rem">${esc(job.dates)} · ${esc(job.place)}</p>
+          <h3 class="mt-2">${esc(job.role)} <span class="muted">· ${esc(job.org)}</span></h3>
+          <ul>${job.points.map((pt) => `<li>${esc(pt)}</li>`).join("")}</ul>
+          <a class="link-primary" href="#/work/${esc(job.slug)}">Open project ${ICON.up}</a>
+        </article>`).join("")}
+        <h3>Education</h3>
+        <ul style="list-style:none;padding:0;margin:1rem 0 0">
+          ${education.map((ed) => `<li style="margin-bottom:1rem"><p style="font-weight:500">${esc(ed.title)}</p><p class="muted" style="font-size:0.875rem">${esc(ed.place)} · ${esc(ed.dates)} · ${esc(ed.note)}</p></li>`).join("")}
+        </ul>
+      </div>
+    </div></section>
+
+    <section id="labs" class="section"><div class="wrap">
+      <p class="kicker">Ten DS / AI labs</p>
+      <h2 class="mt-2">Stacks, rebuilt with my data.</h2>
+      <p class="muted mt-3" style="max-width:36rem">LangGraph, RAG, Promptfoo, Unsloth, MCP, Gemini, Qdrant, OpenHands, Made-With-ML, Microsoft Recommenders — each is an original public repo on my GitHub, not a silent fork. Architecture plus a 3D model on every page.</p>
+      <div class="labs-list">${labList.map((lab) => `<a class="lab-row" href="#/work/${esc(lab.slug)}"><span><h3>${esc(lab.title)}</h3><p>${esc(lab.tags.join(" · "))}</p></span>${ICON.up}</a>`).join("")}</div>
+    </div></section>
+
+    <section id="work" class="section"><div class="wrap">
+      <h2>All work</h2>
+      <p class="muted mt-3" style="max-width:36rem">Original research, industrial ML, and the ten labs. Every card has a 2026 delta, an architecture view, and a 3D scene.</p>
+      <p class="muted mt-2" style="font-family:var(--font-mono);font-size:0.75rem">${projects.length} entries in the catalog</p>
+      <div class="filters mt-8" id="filters">${CATS.map((c) => {
+        const n = c === "All" ? projects.length : c === "Labs" ? labs().length : projects.filter((p) => p.category === c).length;
+        return `<button type="button" class="filter${c === filter ? " active" : ""}" data-cat="${c}">${c}<span class="n">${n}</span></button>`;
+      }).join("")}</div>
+      <div class="grid" id="cards">${vis.map(card).join("")}</div>
+    </div></section>
+
+    <section id="contact" class="section"><div class="wrap">
+      <h2>Contact</h2>
+      <p class="muted mt-3" style="max-width:28rem">Torino. Open to data science, ML engineering, and applied LLM roles.</p>
+      <div class="contact-list">
+        <a href="mailto:${esc(PROFILE.email)}">${ICON.mail}${esc(PROFILE.email)}</a>
+        <a href="tel:${esc(PROFILE.phone.replace(/\s/g, ""))}">${ICON.phone}${esc(PROFILE.phone)}</a>
+        <a href="https://maps.google.com/?q=${encodeURIComponent(PROFILE.address)}" target="_blank" rel="noopener">${ICON.pin}${esc(PROFILE.address)}</a>
+        <a href="${esc(PROFILE.linkedin)}" target="_blank" rel="noopener">${ICON.in}LinkedIn</a>
+        <a href="${esc(PROFILE.github)}" target="_blank" rel="noopener">${ICON.gh}GitHub</a>
+      </div>
+    </div></section>
+  </main>`;
+}
+
+function visible() {
+  if (filter === "All") return projects;
+  if (filter === "Labs") return labs();
+  return projects.filter((p) => p.category === filter);
+}
+
+function projectPage(slug) {
+  const p = projects.find((x) => x.slug === slug);
+  if (!p) {
+    return `<main class="detail wrap"><h1>Project not found</h1><p class="muted mt-3">That slug is not in the catalog.</p><a class="btn btn-primary mt-8" href="#/">Back to work</a></main>`;
   }
-  return '<svg viewBox="0 0 ' + w + ' ' + h + '" xmlns="http://www.w3.org/2000/svg"><defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#67e8f9"/></marker></defs><text class="sub" x="0" y="24">PIPELINE</text>' + arrows + boxes + '</svg>';
+  const related = projects.filter((x) => x.category === p.category && x.slug !== p.slug).slice(0, 3);
+  const gh = p.github
+    ? `<a class="btn btn-primary" href="${esc(p.github)}" target="_blank" rel="noopener">${ICON.gh} Open GitHub</a>`
+    : p.private
+      ? `<button class="btn btn-outline" disabled>Private repository</button>`
+      : "";
+  const up = p.upstream
+    ? `<a class="btn btn-outline" href="${esc(p.upstream)}" target="_blank" rel="noopener">Upstream study ${ICON.up}</a>`
+    : "";
+  const paper = p.paper
+    ? `<a class="btn btn-outline" href="${esc(p.paper)}" target="_blank" rel="noopener">ResearchGate ${ICON.up}</a>`
+    : "";
+  return `<main class="detail wrap">
+    <a class="back" href="#work">${ICON.back} All work</a>
+    <div class="detail-grid">
+      <div>
+        <p class="kicker">${p.lab ? "Lab · " : ""}${esc(p.category)}${p.language ? " · " + esc(p.language) : ""} · ${esc(p.year)}${p.private ? " · Private" : ""}</p>
+        <h1>${esc(p.title)}</h1>
+        <p class="lede">${esc(p.blurb)}</p>
+        <div class="actions">${gh}${up}${paper}</div>
+        <div class="tags">${(p.tags || []).map((t) => `<span class="tag">${esc(t)}</span>`).join("")}</div>
+      </div>
+      <div class="scene detail" data-kind="${esc(p.scene)}">
+        <div class="scene-host"></div>
+        <p class="scene-cap">Drag to orbit the architecture</p>
+      </div>
+    </div>
+    <section class="mt-8">
+      <h2>Story</h2>
+      <p class="muted mt-4" style="max-width:36rem">${esc(p.story)}</p>
+      <p class="muted mt-4" style="font-family:var(--font-mono);font-size:0.75rem">${esc(p.stack)}</p>
+    </section>
+    <section class="mt-8">
+      <h2>Architecture</h2>
+      <p class="muted mt-2" style="font-size:0.875rem">Pipeline as shipped — or as it should read on a resume.</p>
+      <div class="arch-box"><div class="arch">${p.arch.map((s, i) => `<div class="arch-step"><div class="n">${String(i + 1).padStart(2, "0")}</div><div class="t">${esc(s.title)}</div><div class="s">${esc(s.sub)}</div></div>`).join("")}</div></div>
+    </section>
+    <section class="split">
+      <div>
+        <h2>What changed</h2>
+        <p class="muted mt-2" style="font-size:0.875rem">A little new on every project — not a leftover README.</p>
+        <div class="mt-5">${p.whatsNew.map((x) => `<p class="note mt-3">${esc(x)}</p>`).join("")}</div>
+      </div>
+      <div>
+        <h2>Next</h2>
+        <p class="muted mt-2" style="font-size:0.875rem">Honest follow-ups, not a fake roadmap.</p>
+        <div class="mt-5">${p.next.map((x) => `<p class="note quiet mt-3">${esc(x)}</p>`).join("")}</div>
+      </div>
+    </section>
+    ${related.length ? `<section class="related"><h2>Same slice</h2><ul>${related.map((r) => `<li><a href="#/work/${esc(r.slug)}"><span class="muted" style="font-family:var(--font-mono);font-size:0.75rem">${esc(r.year)}</span><span style="margin-top:0.25rem;font-weight:500">${esc(r.title)}</span></a></li>`).join("")}</ul></section>` : ""}
+  </main>`;
 }
 
-function cardHTML(p, feat) {
-  var gh;
-  if (p.github) gh = '<a class="mini gh" href="' + p.github + '" target="_blank" rel="noopener">GitHub</a>';
-  else if (p.paper) gh = '<a class="mini gh" href="' + p.paper + '" target="_blank" rel="noopener">ResearchGate</a>';
-  else gh = '<span class="mini">Private / in progress</span>';
-  var tags = p.tags.map(function (t) { return '<span class="tag">' + t + '</span>'; }).join('');
-  var label = feat ? (p.n + '  |  ' + p.stars + ' stars') : p.org;
-  return '<article class="proj ' + (feat ? '' : 'own') + '"><div class="proj-num"><span class="stars">' + label + '</span></div><h3>' + p.title + '</h3><p>' + p.blurb + '</p><div class="tags">' + tags + '</div><div class="actions">' + gh + '<button class="mini arch" data-open="' + p.id + '">Architecture</button></div></article>';
-}
-
-function findProject(id) {
-  var i;
-  for (i = 0; i < featured.length; i++) if (featured[i].id === id) return featured[i];
-  for (i = 0; i < own.length; i++) if (own[i].id === id) return own[i];
-  return null;
-}
-
-function openModal(id) {
-  var p = findProject(id);
-  if (!p) return;
-  var link = p.github || p.paper;
-  document.getElementById('modal-title').textContent = p.title;
-  document.getElementById('modal-sub').textContent = p.stack;
-  document.getElementById('modal-arch').innerHTML = svgArch(p.arch);
-  var cta = document.getElementById('modal-cta');
-  if (link) {
-    cta.style.display = 'inline-flex';
-    cta.href = link;
-    cta.textContent = p.github ? 'Open GitHub repository' : 'Open on ResearchGate';
-  } else {
-    cta.style.display = 'none';
+function bindScenes() {
+  if (sceneDispose) {
+    sceneDispose();
+    sceneDispose = null;
   }
-  document.getElementById('modal').classList.add('open');
+  const box = document.querySelector(".scene");
+  const host = box?.querySelector(".scene-host");
+  if (!box || !host) return;
+  const kind = box.getAttribute("data-kind") || "constellation";
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const nodes = labs().map((p) => ({ slug: p.slug, title: p.title, kind: p.scene }));
+  try {
+    sceneDispose = mountScene(host, {
+      kind,
+      nodes,
+      reducedMotion: reduced,
+      onSelect: (slug) => {
+        location.hash = `#/work/${slug}`;
+      },
+    });
+  } catch (err) {
+    console.error(err);
+  }
 }
 
-document.getElementById('featured-grid').innerHTML = featured.map(function (p) { return cardHTML(p, true); }).join('');
-document.getElementById('own-grid').innerHTML = own.map(function (p) { return cardHTML(p, false); }).join('');
-document.body.addEventListener('click', function (e) {
-  var btn = e.target.closest('[data-open]');
-  if (btn) openModal(btn.getAttribute('data-open'));
-  if (e.target.id === 'modal' || e.target.closest('.close')) document.getElementById('modal').classList.remove('open');
-});
-document.addEventListener('keydown', function (e) {
-  if (e.key === 'Escape') document.getElementById('modal').classList.remove('open');
-});
-document.getElementById('gh-profile').href = CONFIG.githubProfile;
-document.getElementById('li-profile').href = CONFIG.linkedin;
-document.getElementById('rg-profile').href = CONFIG.researchgate;
-document.getElementById('mail-link').href = 'mailto:' + CONFIG.email;
-document.getElementById('mail-text').textContent = CONFIG.email;
-document.getElementById('phone-text').textContent = CONFIG.phone;
-document.getElementById('year').textContent = new Date().getFullYear();
+function route() {
+  const hash = location.hash || "";
+  const work = hash.match(/^#\/work\/([^/?]+)/);
+  const root = document.getElementById("root");
+  if (work) {
+    root.innerHTML = header() + projectPage(decodeURIComponent(work[1])) + footer();
+    bindScenes();
+    window.scrollTo(0, 0);
+    return;
+  }
+  root.innerHTML = header() + home() + footer();
+  bindScenes();
+  const filters = document.getElementById("filters");
+  filters?.addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-cat]");
+    if (!btn) return;
+    filter = btn.getAttribute("data-cat");
+    document.getElementById("cards").innerHTML = visible().map(card).join("");
+    filters.querySelectorAll(".filter").forEach((el) => {
+      el.classList.toggle("active", el.getAttribute("data-cat") === filter);
+    });
+  });
+  const section = hash.replace(/^#/, "");
+  if (section && !section.startsWith("/")) {
+    document.getElementById(section)?.scrollIntoView();
+  }
+}
+
+window.addEventListener("hashchange", route);
+route();

@@ -374,15 +374,6 @@ function mountScene(el, opts) {
     if (!(child instanceof THREE.Light)) rig.add(child);
   });
   scene.add(rig);
-  const sky = new THREE.Mesh(
-    new THREE.SphereGeometry(16, 24, 16),
-    new THREE.MeshBasicMaterial({
-      color: new THREE.Color().setStyle(PAPER),
-      side: THREE.BackSide,
-      depthWrite: false
-    })
-  );
-  scene.add(sky);
   const bases = /* @__PURE__ */ new Map();
   rig.traverse((obj) => {
     if (obj instanceof THREE.Mesh) bases.set(obj, obj.position.clone());

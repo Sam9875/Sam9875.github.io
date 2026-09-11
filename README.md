@@ -1,2 +1,5 @@
-# Sam9875.github.io
-Personal portfolio — Data Science &amp; AI — Samesun Singh
+# Samesun Singh — portfolio
+
+Live site: https://sam9875.github.io/
+
+GitHub: https://github.com/Sam9875

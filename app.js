@@ -77,7 +77,7 @@ function card(p) {
     <p class="delta"><span class="lbl">New · </span>${esc(p.whatsNew[0] || "")}</p>
     <div class="tags">${(p.tags || []).slice(0, 3).map((t) => `<span class="tag">${esc(t)}</span>`).join("")}</div>
     <div class="card-links">
-      <a class="arch" href="#/work/${esc(p.slug)}">Architecture ${ICON.up}</a>
+      <a class="arch" href="#/work/${esc(p.slug)}">Architecture</a>
       ${gh}
     </div>
   </article>`;
@@ -129,7 +129,7 @@ function home() {
           <p class="muted" style="font-family:var(--font-mono);font-size:0.75rem">${esc(job.dates)} · ${esc(job.place)}</p>
           <h3 class="mt-2">${esc(job.role)} <span class="muted">· ${esc(job.org)}</span></h3>
           <ul>${job.points.map((pt) => `<li>${esc(pt)}</li>`).join("")}</ul>
-          <a class="link-primary" href="#/work/${esc(job.slug)}">Open project ${ICON.up}</a>
+          <a class="link-primary" href="#/work/${esc(job.slug)}">Open project</a>
         </article>`).join("")}
         <h3>Education</h3>
         <ul style="list-style:none;padding:0;margin:1rem 0 0">
@@ -142,7 +142,7 @@ function home() {
       <p class="kicker">Ten DS / AI labs</p>
       <h2 class="mt-2">Stacks, rebuilt with my data.</h2>
       <p class="muted mt-3" style="max-width:36rem">LangGraph, RAG, Promptfoo, Unsloth, MCP, Gemini, Qdrant, OpenHands, Made-With-ML, Microsoft Recommenders — each is an original public repo on my GitHub, not a silent fork. Architecture plus a 3D model on every page.</p>
-      <div class="labs-list">${labList.map((lab) => `<a class="lab-row" href="#/work/${esc(lab.slug)}"><span><h3>${esc(lab.title)}</h3><p>${esc(lab.tags.join(" · "))}</p></span>${ICON.up}</a>`).join("")}</div>
+      <div class="labs-list">${labList.map((lab) => `<a class="lab-row" href="#/work/${esc(lab.slug)}"><span><h3>${esc(lab.title)}</h3><p>${esc(lab.tags.join(" · "))}</p></span></a>`).join("")}</div>
     </div></section>
 
     <section id="work" class="section"><div class="wrap">
@@ -188,10 +188,10 @@ function projectPage(slug) {
       ? `<button class="btn btn-outline" disabled>Private repository</button>`
       : "";
   const up = p.upstream
-    ? `<a class="btn btn-outline" href="${esc(p.upstream)}" target="_blank" rel="noopener">Upstream study ${ICON.up}</a>`
+    ? `<a class="btn btn-outline" href="${esc(p.upstream)}" target="_blank" rel="noopener">Upstream study</a>`
     : "";
   const paper = p.paper
-    ? `<a class="btn btn-outline" href="${esc(p.paper)}" target="_blank" rel="noopener">ResearchGate ${ICON.up}</a>`
+    ? `<a class="btn btn-outline" href="${esc(p.paper)}" target="_blank" rel="noopener">ResearchGate</a>`
     : "";
   return `<main class="detail wrap">
     <a class="back" href="#work">${ICON.back} All work</a>

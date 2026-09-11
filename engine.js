@@ -1,11 +1,11 @@
 // src/components/three/engine.ts
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-var INK = 921614;
-var TEAL = 4045466;
-var FG = 15265513;
-var MUTED = 9082253;
-function labelSprite(text, color = "#e8eee9") {
+var PAPER = 15986662;
+var TEAL = 949606;
+var FG = 1711900;
+var MUTED = 6121056;
+function labelSprite(text, color = "#1a1f1c") {
   const canvas = document.createElement("canvas");
   canvas.width = 512;
   canvas.height = 128;
@@ -28,7 +28,7 @@ function makeRenderer(el) {
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   renderer.setSize(el.clientWidth, el.clientHeight);
-  renderer.setClearColor(INK, 1);
+  renderer.setClearColor(PAPER, 1);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   el.appendChild(renderer.domElement);
   renderer.domElement.style.display = "block";
@@ -38,11 +38,11 @@ function makeRenderer(el) {
   return renderer;
 }
 function lights(scene) {
-  scene.add(new THREE.AmbientLight(12108990, 0.55));
-  const key = new THREE.PointLight(TEAL, 1.4, 40);
+  scene.add(new THREE.AmbientLight(16775920, 0.92));
+  const key = new THREE.PointLight(TEAL, 1.15, 40);
   key.position.set(4, 6, 5);
   scene.add(key);
-  const fill = new THREE.PointLight(FG, 0.35, 30);
+  const fill = new THREE.PointLight(16777215, 0.45, 30);
   fill.position.set(-6, -2, -4);
   scene.add(fill);
 }
@@ -81,7 +81,7 @@ function buildGraph(scene) {
     const mesh = new THREE.Mesh(new THREE.SphereGeometry(0.22, 24, 16), nodeMat());
     mesh.position.copy(p);
     scene.add(mesh);
-    const s = labelSprite(name, "#3dba9a");
+    const s = labelSprite(name, "#0e7d66");
     s.position.copy(p).add(new THREE.Vector3(0, 0.42, 0));
     scene.add(s);
   });
@@ -162,7 +162,7 @@ function buildMultimodal(scene) {
     mesh.position.set(p.pos[0], p.pos[1], p.pos[2]);
     mesh.rotation.y = p.rot;
     scene.add(mesh);
-    const s = labelSprite(p.label, "#3dba9a");
+    const s = labelSprite(p.label, "#0e7d66");
     s.position.set(p.pos[0], p.pos[1] + 0.7, p.pos[2]);
     scene.add(s);
   });
@@ -290,7 +290,7 @@ function buildConstellation(scene, nodes, pickables) {
     mesh.userData.slug = node.slug;
     scene.add(mesh);
     pickables.push(mesh);
-    const s = labelSprite(node.title, "#e8eee9");
+    const s = labelSprite(node.title, "#1a1f1c");
     s.position.copy(p).add(new THREE.Vector3(0, 0.32, 0));
     scene.add(s);
   });
@@ -353,13 +353,21 @@ function populate(scene, kind, nodes, pickables) {
 }
 function mountScene(el, opts) {
   const scene = new THREE.Scene();
-  scene.fog = new THREE.Fog(INK, 8, 18);
   const camera = new THREE.PerspectiveCamera(42, el.clientWidth / Math.max(el.clientHeight, 1), 0.1, 80);
   camera.position.set(0, 1.4, 7.2);
   const renderer = makeRenderer(el);
   lights(scene);
   const pickables = [];
   populate(scene, opts.kind, opts.nodes ?? [], pickables);
+  const rig = new THREE.Group();
+  [...scene.children].forEach((child) => {
+    if (!(child instanceof THREE.Light)) rig.add(child);
+  });
+  scene.add(rig);
+  const bases = /* @__PURE__ */ new Map();
+  rig.traverse((obj) => {
+    if (obj instanceof THREE.Mesh) bases.set(obj, obj.position.clone());
+  });
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
   controls.dampingFactor = 0.06;
@@ -367,7 +375,7 @@ function mountScene(el, opts) {
   controls.minDistance = 4;
   controls.maxDistance = 14;
   controls.autoRotate = !opts.reducedMotion;
-  controls.autoRotateSpeed = 0.6;
+  controls.autoRotateSpeed = 1.6;
   controls.target.set(0, 0, 0);
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
@@ -382,9 +390,22 @@ function mountScene(el, opts) {
     if (slug) opts.onSelect(slug);
   };
   renderer.domElement.addEventListener("pointerup", onClick);
+  const clock = new THREE.Clock();
   let frame = 0;
   const tick = () => {
     frame = requestAnimationFrame(tick);
+    const t = clock.getElapsedTime();
+    if (!opts.reducedMotion) {
+      rig.rotation.y = t * 0.22;
+      rig.rotation.x = Math.sin(t * 0.4) * 0.07;
+      let i = 0;
+      bases.forEach((base, obj) => {
+        obj.rotation.y = t * 0.7 + i * 0.2;
+        obj.rotation.z = Math.sin(t * 0.9 + i) * 0.12;
+        obj.position.y = base.y + Math.sin(t * 1.4 + i * 0.7) * 0.14;
+        i += 1;
+      });
+    }
     controls.update();
     renderer.render(scene, camera);
   };

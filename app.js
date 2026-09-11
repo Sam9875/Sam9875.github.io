@@ -1,4 +1,4 @@
-import { mountScene } from "./engine.js";
+import { mountScene } from "./engine.js?v=20260911c";
 import {
   PROFILE,
   education,
@@ -10,14 +10,11 @@ import {
 
 const CATS = ["All", "Labs", "RecSys", "LLM", "Vision", "NLP", "Systems", "Industry", "Course"];
 const ICON = {
-  gh: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.2c3.5-.4 7-1.6 7-7.2 0-1.6-.6-2.8-1.6-3.8.1-.4.7-1.9-.2-3.8 0 0-1.3-.4-4.2 1.6A14 14 0 0 0 12 4a14 14 0 0 0-3.8.4C5.3 2.4 4 2.8 4 2.8c-.9 1.9-.3 3.4-.2 3.8-1 1-1.6 2.2-1.6 3.8 0 5.6 3.5 6.8 7 7.2a4.8 4.8 0 0 0-1 3.2v4"/><path d="M9 18c-4.5 1.5-4.5-2.5-6-3"/></svg>',
-  mail: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>',
-  phone: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.6a2 2 0 0 1-.4 2.1L8 9.9a16 16 0 0 0 6 6l1.4-1.3a2 2 0 0 1 2.1-.4c.8.3 1.7.5 2.6.6a2 2 0 0 1 1.7 2.1z"/></svg>',
-  pin: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>',
-  in: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>',
-  up: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg>',
-  back: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>',
-  down: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v14"/><path d="m6 13 6 6 6-6"/><path d="M4 21h16"/></svg>',
+  gh: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.2c3.5-.4 7-1.6 7-7.2 0-1.6-.6-2.8-1.6-3.8.1-.4.7-1.9-.2-3.8 0 0-1.3-.4-4.2 1.6A14 14 0 0 0 12 4a14 14 0 0 0-3.8.4C5.3 2.4 4 2.8 4 2.8c-.9 1.9-.3 3.4-.2 3.8-1 1-1.6 2.2-1.6 3.8 0 5.6 3.5 6.8 7 7.2a4.8 4.8 0 0 0-1 3.2v4"/><path d="M9 18c-4.5 1.5-4.5-2.5-6-3"/></svg>',
+  mail: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>',
+  phone: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.6a2 2 0 0 1-.4 2.1L8 9.9a16 16 0 0 0 6 6l1.4-1.3a2 2 0 0 1 2.1-.4c.8.3 1.7.5 2.6.6a2 2 0 0 1 1.7 2.1z"/></svg>',
+  pin: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>',
+  in: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>',
 };
 
 let sceneDispose = null;
@@ -50,7 +47,7 @@ function header() {
       <a href="#experience">Experience</a>
       <a href="#about">About</a>
       <a href="#contact">Contact</a>
-      <a class="btn btn-outline btn-sm" href="Samesun_Singh_CV_EN.pdf" download>${ICON.down} CV</a>
+      <a class="btn btn-outline btn-sm" href="Samesun_Singh_CV_EN.pdf" download>CV</a>
     </nav>
   </div></header>`;
 }
@@ -194,7 +191,7 @@ function projectPage(slug) {
     ? `<a class="btn btn-outline" href="${esc(p.paper)}" target="_blank" rel="noopener">ResearchGate</a>`
     : "";
   return `<main class="detail wrap">
-    <a class="back" href="#work">${ICON.back} All work</a>
+    <a class="back" href="#work">All work</a>
     <div class="detail-grid">
       <div>
         <p class="kicker">${p.lab ? "Lab · " : ""}${esc(p.category)}${p.language ? " · " + esc(p.language) : ""} · ${esc(p.year)}${p.private ? " · Private" : ""}</p>
@@ -215,8 +212,8 @@ function projectPage(slug) {
     </section>
     <section class="mt-8">
       <h2>Architecture</h2>
-      <p class="muted mt-2" style="font-size:0.875rem">Pipeline as shipped — or as it should read on a resume.</p>
-      <div class="arch-box"><div class="arch">${p.arch.map((s, i) => `<div class="arch-step"><div class="n">${String(i + 1).padStart(2, "0")}</div><div class="t">${esc(s.title)}</div><div class="s">${esc(s.sub)}</div></div>`).join("")}</div></div>
+      <p class="muted mt-2" style="font-size:0.875rem">Pipeline as shipped — a packet moving through each stage.</p>
+      <div class="arch-box"><div class="arch-rail" aria-hidden="true"><span class="arch-token"></span></div><div class="arch">${p.arch.map((s, i) => `<div class="arch-step"><div class="n">${String(i + 1).padStart(2, "0")}</div><div class="t">${esc(s.title)}</div><div class="s">${esc(s.sub)}</div></div>`).join("")}</div></div>
     </section>
     <section class="split">
       <div>

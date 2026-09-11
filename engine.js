@@ -1,11 +1,12 @@
 // src/components/three/engine.ts
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-var PAPER = 15986662;
+var PAPER = "#f3efe6";
+var SAND = 13616566;
 var TEAL = 949606;
-var FG = 1711900;
-var MUTED = 6121056;
-function labelSprite(text, color = "#1a1f1c") {
+var PINE = 2382928;
+var MUTED = 8029308;
+function labelSprite(text, color = "#245c50") {
   const canvas = document.createElement("canvas");
   canvas.width = 512;
   canvas.height = 128;
@@ -35,15 +36,16 @@ function makeRenderer(el) {
   renderer.domElement.style.width = "100%";
   renderer.domElement.style.height = "100%";
   renderer.domElement.style.touchAction = "none";
+  renderer.domElement.style.background = PAPER;
   return renderer;
 }
 function lights(scene) {
-  scene.add(new THREE.AmbientLight(16775920, 0.92));
-  const key = new THREE.PointLight(TEAL, 1.15, 40);
-  key.position.set(4, 6, 5);
+  scene.add(new THREE.HemisphereLight(16775920, 13945784, 1.15));
+  const key = new THREE.DirectionalLight(16777215, 0.9);
+  key.position.set(4, 7, 6);
   scene.add(key);
-  const fill = new THREE.PointLight(16777215, 0.45, 30);
-  fill.position.set(-6, -2, -4);
+  const fill = new THREE.PointLight(TEAL, 0.55, 28);
+  fill.position.set(-5, 3, -3);
   scene.add(fill);
 }
 function addCore(scene) {
@@ -51,25 +53,34 @@ function addCore(scene) {
   const m = new THREE.MeshStandardMaterial({
     color: TEAL,
     emissive: TEAL,
-    emissiveIntensity: 0.35,
+    emissiveIntensity: 0.28,
     roughness: 0.35,
-    metalness: 0.2
+    metalness: 0.15
   });
   const mesh = new THREE.Mesh(g, m);
   scene.add(mesh);
   return mesh;
 }
 function wireMat() {
-  return new THREE.LineBasicMaterial({ color: TEAL, transparent: true, opacity: 0.45 });
+  return new THREE.LineBasicMaterial({ color: TEAL, transparent: true, opacity: 0.4 });
 }
 function nodeMat(hex = TEAL) {
   return new THREE.MeshStandardMaterial({
     color: hex,
     emissive: hex,
-    emissiveIntensity: 0.22,
-    roughness: 0.4,
-    metalness: 0.15
+    emissiveIntensity: 0.18,
+    roughness: 0.42,
+    metalness: 0.08
   });
+}
+function addGround(scene) {
+  const ground = new THREE.Mesh(
+    new THREE.CircleGeometry(3.8, 48),
+    new THREE.MeshStandardMaterial({ color: 15196628, roughness: 0.95, metalness: 0 })
+  );
+  ground.rotation.x = -Math.PI / 2;
+  ground.position.y = -1.55;
+  scene.add(ground);
 }
 function buildGraph(scene) {
   const labels = ["plan", "retrieve", "policy", "draft"];
@@ -93,9 +104,9 @@ function buildRag(scene) {
     const box = new THREE.Mesh(
       new THREE.BoxGeometry(1.6, 0.08, 1),
       new THREE.MeshStandardMaterial({
-        color: i === 2 ? TEAL : 1844256,
+        color: i === 2 ? TEAL : SAND,
         emissive: i === 2 ? TEAL : 0,
-        emissiveIntensity: i === 2 ? 0.3 : 0,
+        emissiveIntensity: i === 2 ? 0.28 : 0,
         roughness: 0.5
       })
     );
@@ -103,7 +114,7 @@ function buildRag(scene) {
     box.rotation.y = 0.2;
     scene.add(box);
   }
-  const q = new THREE.Mesh(new THREE.SphereGeometry(0.16, 20, 16), nodeMat(FG));
+  const q = new THREE.Mesh(new THREE.SphereGeometry(0.16, 20, 16), nodeMat(PINE));
   q.position.set(-2.4, 0.8, 1.2);
   scene.add(q);
 }
@@ -118,10 +129,7 @@ function buildEval(scene) {
 function buildLora(scene) {
   const core = addCore(scene);
   core.scale.setScalar(2.2);
-  const torus = new THREE.Mesh(
-    new THREE.TorusGeometry(1.35, 0.08, 12, 64),
-    nodeMat(TEAL)
-  );
+  const torus = new THREE.Mesh(new THREE.TorusGeometry(1.35, 0.08, 12, 64), nodeMat(TEAL));
   torus.rotation.x = Math.PI / 2.6;
   scene.add(torus);
   const torus2 = torus.clone();
@@ -134,7 +142,7 @@ function buildMcp(scene) {
   const tools = ["news", "fit", "risk"];
   tools.forEach((t, i) => {
     const a = i / tools.length * Math.PI * 2;
-    const cube = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.38, 0.38), nodeMat(FG));
+    const cube = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.38, 0.38), nodeMat(PINE));
     cube.position.set(Math.cos(a) * 1.8, Math.sin(a * 2) * 0.35, Math.sin(a) * 1.8);
     scene.add(cube);
     const s = labelSprite(t);
@@ -152,11 +160,11 @@ function buildMultimodal(scene) {
     const mesh = new THREE.Mesh(
       new THREE.PlaneGeometry(1.4, 1),
       new THREE.MeshStandardMaterial({
-        color: 1712670,
+        color: 15196628,
         emissive: TEAL,
-        emissiveIntensity: 0.18,
+        emissiveIntensity: 0.16,
         side: THREE.DoubleSide,
-        roughness: 0.6
+        roughness: 0.55
       })
     );
     mesh.position.set(p.pos[0], p.pos[1], p.pos[2]);
@@ -205,7 +213,7 @@ function buildMlops(scene) {
   });
   const belt = new THREE.Mesh(
     new THREE.BoxGeometry(4.4, 0.06, 0.8),
-    new THREE.MeshStandardMaterial({ color: 1712670, roughness: 0.8 })
+    new THREE.MeshStandardMaterial({ color: SAND, roughness: 0.8 })
   );
   belt.position.y = -0.32;
   scene.add(belt);
@@ -213,12 +221,12 @@ function buildMlops(scene) {
 function buildTowers(scene) {
   const left = new THREE.Mesh(new THREE.BoxGeometry(0.7, 2.4, 0.7), nodeMat(TEAL));
   left.position.set(-1.1, 0.2, 0);
-  const right = new THREE.Mesh(new THREE.BoxGeometry(0.7, 2.4, 0.7), nodeMat(FG));
+  const right = new THREE.Mesh(new THREE.BoxGeometry(0.7, 2.4, 0.7), nodeMat(PINE));
   right.position.set(1.1, 0.2, 0);
   scene.add(left, right);
   const bridge = new THREE.Mesh(
     new THREE.BoxGeometry(2.2, 0.08, 0.3),
-    new THREE.MeshStandardMaterial({ color: TEAL, emissive: TEAL, emissiveIntensity: 0.4 })
+    new THREE.MeshStandardMaterial({ color: TEAL, emissive: TEAL, emissiveIntensity: 0.35 })
   );
   bridge.position.y = 0.5;
   scene.add(bridge);
@@ -238,7 +246,7 @@ function buildAudit(scene) {
   }
   const wall = new THREE.Mesh(
     new THREE.BoxGeometry(0.06, 2.2, 1.6),
-    new THREE.MeshStandardMaterial({ color: FG, transparent: true, opacity: 0.25 })
+    new THREE.MeshStandardMaterial({ color: PINE, transparent: true, opacity: 0.28 })
   );
   scene.add(wall);
 }
@@ -250,10 +258,10 @@ function buildVision(scene) {
   const mat = new THREE.MeshStandardMaterial({
     color: TEAL,
     transparent: true,
-    opacity: 0.18,
+    opacity: 0.22,
     side: THREE.DoubleSide,
     emissive: TEAL,
-    emissiveIntensity: 0.2
+    emissiveIntensity: 0.18
   });
   const cone = new THREE.Mesh(geo, mat);
   cone.rotation.x = Math.PI / 2;
@@ -261,12 +269,10 @@ function buildVision(scene) {
   scene.add(cone);
 }
 function buildSystems(scene) {
-  const pts = [];
   for (let x = -1; x <= 1; x++) {
     for (let y = -1; y <= 1; y++) {
       for (let z = -1; z <= 1; z++) {
         const p = new THREE.Vector3(x * 1.1, y * 1.1, z * 1.1);
-        pts.push(p);
         const m = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.22, 0.22), nodeMat(x === 0 && y === 0 ? TEAL : MUTED));
         m.position.copy(p);
         scene.add(m);
@@ -290,7 +296,7 @@ function buildConstellation(scene, nodes, pickables) {
     mesh.userData.slug = node.slug;
     scene.add(mesh);
     pickables.push(mesh);
-    const s = labelSprite(node.title, "#1a1f1c");
+    const s = labelSprite(node.title, "#245c50");
     s.position.copy(p).add(new THREE.Vector3(0, 0.32, 0));
     scene.add(s);
   });
@@ -304,6 +310,7 @@ function buildConstellation(scene, nodes, pickables) {
   scene.add(new THREE.LineSegments(g, wireMat()));
 }
 function populate(scene, kind, nodes, pickables) {
+  addGround(scene);
   switch (kind) {
     case "graph":
       buildGraph(scene);
@@ -353,6 +360,7 @@ function populate(scene, kind, nodes, pickables) {
 }
 function mountScene(el, opts) {
   const scene = new THREE.Scene();
+  scene.background = new THREE.Color(PAPER);
   const camera = new THREE.PerspectiveCamera(42, el.clientWidth / Math.max(el.clientHeight, 1), 0.1, 80);
   camera.position.set(0, 1.4, 7.2);
   const renderer = makeRenderer(el);
@@ -375,7 +383,7 @@ function mountScene(el, opts) {
   controls.minDistance = 4;
   controls.maxDistance = 14;
   controls.autoRotate = !opts.reducedMotion;
-  controls.autoRotateSpeed = 1.6;
+  controls.autoRotateSpeed = 2.4;
   controls.target.set(0, 0, 0);
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
@@ -396,13 +404,13 @@ function mountScene(el, opts) {
     frame = requestAnimationFrame(tick);
     const t = clock.getElapsedTime();
     if (!opts.reducedMotion) {
-      rig.rotation.y = t * 0.22;
-      rig.rotation.x = Math.sin(t * 0.4) * 0.07;
+      rig.rotation.y = t * 0.32;
+      rig.rotation.x = Math.sin(t * 0.45) * 0.08;
       let i = 0;
       bases.forEach((base, obj) => {
-        obj.rotation.y = t * 0.7 + i * 0.2;
-        obj.rotation.z = Math.sin(t * 0.9 + i) * 0.12;
-        obj.position.y = base.y + Math.sin(t * 1.4 + i * 0.7) * 0.14;
+        obj.rotation.y = t * 0.85 + i * 0.2;
+        obj.rotation.z = Math.sin(t * 1.05 + i) * 0.14;
+        obj.position.y = base.y + Math.sin(t * 1.6 + i * 0.7) * 0.16;
         i += 1;
       });
     }

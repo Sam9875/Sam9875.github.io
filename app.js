@@ -73,7 +73,7 @@ function home() {
       </nav>
     </header>
     <p class="map-hint" id="map-hint">Click a ring to zoom in</p>
-    <button type="button" class="map-back" id="btn-back" hidden>‹ Back to map</button>
+    <button type="button" class="map-back" id="btn-back">Recenter</button>
     <aside class="map-sheet" id="map-sheet" hidden></aside>
   </div>`;
 }
@@ -183,7 +183,6 @@ function setAreaLabel(id) {
   };
   const areaEl = document.getElementById("map-area");
   const copyEl = document.getElementById("map-copy");
-  const back = document.getElementById("btn-back");
   if (areaEl) areaEl.textContent = names[id] || id;
   if (copyEl) {
     if (id === "origin") copyEl.innerHTML = copies.origin;
@@ -193,7 +192,6 @@ function setAreaLabel(id) {
     }
     if (id === "origin") copyEl.className = "";
   }
-  if (back) back.hidden = id === "origin";
 }
 
 function bindMap() {
@@ -210,7 +208,7 @@ function bindMap() {
     closeSheet();
     mapHandle?.reset();
   });
-  import("./living-map.js?v=20260914j")
+  import("./living-map.js?v=20260914k")
     .then((mod) => {
       if (!document.getElementById("map-host")) return;
       mapHandle = mod.mountLivingMap(host, {
@@ -329,7 +327,7 @@ function bindScenes() {
   const kind = box.getAttribute("data-kind") || "constellation";
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const nodes = labs().map((p) => ({ slug: p.slug, title: p.title, kind: p.scene }));
-  import("./engine.js?v=20260914j")
+  import("./engine.js?v=20260914k")
     .then((mod) => {
       sceneDispose = mod.mountScene(host, {
         kind,

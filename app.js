@@ -20,10 +20,11 @@ let mapHandle = null;
 let currentArea = "origin";
 
 function esc(s) {
+  const amp = String.fromCharCode(38);
   return String(s ?? "")
-    .replace(/&/g, "&")
-    .replace(/</g, "<")
-    .replace(/"/g, """);
+    .replace(/&/g, amp + "amp;")
+    .replace(/</g, amp + "lt;")
+    .replace(/"/g, amp + "quot;");
 }
 
 function labs() {

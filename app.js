@@ -71,7 +71,7 @@ function home() {
         <a class="hud-btn" href="Samesun_Singh_CV_EN.pdf" download>CV</a>
       </nav>
     </header>
-    <p class="map-hint" id="map-hint">click a ring to zoom · names sit on the ring</p>
+    <p class="map-hint" id="map-hint">Click a ring to zoom in</p>
     <button type="button" class="map-back" id="btn-back" hidden>‹ Back to map</button>
     <aside class="map-sheet" id="map-sheet" hidden></aside>
   </div>`;
@@ -208,7 +208,7 @@ function bindMap() {
     closeSheet();
     mapHandle?.reset();
   });
-  import("./living-map.js?v=20260914e")
+  import("./living-map.js?v=20260914f")
     .then((mod) => {
       if (!document.getElementById("map-host")) return;
       mapHandle = mod.mountLivingMap(host, {
@@ -217,7 +217,7 @@ function bindMap() {
         onHover: (pick) => {
           const hint = document.getElementById("map-hint");
           if (!hint) return;
-          hint.textContent = pick?.type === "node" ? pick.label : pick?.type === "area" ? pick.id : "click a ring to zoom · names sit on the ring";
+          hint.textContent = pick?.type === "node" ? pick.label : pick?.type === "area" ? pick.id : "Click a ring to zoom in";
         },
         onPick: (pick) => {
           if (pick.type === "area") {
@@ -327,7 +327,7 @@ function bindScenes() {
   const kind = box.getAttribute("data-kind") || "constellation";
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const nodes = labs().map((p) => ({ slug: p.slug, title: p.title, kind: p.scene }));
-  import("./engine.js?v=20260914e")
+  import("./engine.js?v=20260914f")
     .then((mod) => {
       sceneDispose = mod.mountScene(host, {
         kind,

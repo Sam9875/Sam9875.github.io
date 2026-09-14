@@ -1,7 +1,14 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="SS">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Samesun Singh">
   <rect width="32" height="32" rx="8" fill="#f3efe6"/>
-  <g fill="none" stroke="#0e7d66" stroke-width="2.45" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M13.15 9.45c-1.05-1.15-4.35-1.55-5.55.35-1.1 1.7.35 3.15 2.55 3.8 2.35.7 3.65 1.55 3.5 3.45-.2 2.35-2.7 3.45-5.2 2.45"/>
-    <path d="M24.55 9.45c-1.05-1.15-4.35-1.55-5.55.35-1.1 1.7.35 3.15 2.55 3.8 2.35.7 3.65 1.55 3.5 3.45-.2 2.35-2.7 3.45-5.2 2.45"/>
+  <g stroke="#0e7d66" stroke-width="2" stroke-linecap="round">
+    <line x1="10" y1="21" x2="16" y2="9.5"/>
+    <line x1="16" y1="9.5" x2="24" y2="15"/>
+    <line x1="16" y1="9.5" x2="21" y2="24"/>
+  </g>
+  <g fill="#0e7d66">
+    <circle cx="16" cy="9.5" r="3.5"/>
+    <circle cx="10" cy="21" r="2.5"/>
+    <circle cx="24" cy="15" r="2.5"/>
+    <circle cx="21" cy="24" r="2.1"/>
   </g>
 </svg>

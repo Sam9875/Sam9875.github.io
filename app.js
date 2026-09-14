@@ -1,4 +1,5 @@
-import { mountScene } from "./engine.js?v=20260911g";
+import { mountScene } from "./engine.js?v=20260914a";
+import { mountLivingMap } from "./living-map.js?v=20260914a";
 import {
   PROFILE,
   education,
@@ -8,7 +9,6 @@ import {
   skillGroups,
 } from "./data.js";
 
-const CATS = ["All", "Labs", "RecSys", "LLM", "Vision", "NLP", "Systems", "Industry", "Course"];
 const ICON = {
   gh: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.2c3.5-.4 7-1.6 7-7.2 0-1.6-.6-2.8-1.6-3.8.1-.4.7-1.9-.2-3.8 0 0-1.3-.4-4.2 1.6A14 14 0 0 0 12 4a14 14 0 0 0-3.8.4C5.3 2.4 4 2.8 4 2.8c-.9 1.9-.3 3.4-.2 3.8-1 1-1.6 2.2-1.6 3.8 0 5.6 3.5 6.8 7 7.2a4.8 4.8 0 0 0-1 3.2v4"/><path d="M9 18c-4.5 1.5-4.5-2.5-6-3"/></svg>',
   mail: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>',
@@ -18,20 +18,18 @@ const ICON = {
 };
 
 let sceneDispose = null;
-let filter = "All";
+let mapHandle = null;
+let currentArea = "origin";
 
 function esc(s) {
   return String(s ?? "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/"/g, "&quot;");
+    .replace(/&/g, "&")
+    .replace(/</g, "<")
+    .replace(/"/g, """);
 }
 
 function labs() {
   return projects.filter((p) => p.lab);
-}
-function publicCount() {
-  return projects.filter((p) => p.repo && !p.private).length;
 }
 
 function header() {
@@ -41,12 +39,8 @@ function header() {
       <span class="brand-name">${esc(PROFILE.name)}</span>
     </a>
     <nav class="nav-links">
-      <a class="mobile" href="#work">Work</a>
-      <a href="#labs">Labs</a>
-      <a href="#work">Work</a>
-      <a href="#experience">Experience</a>
-      <a href="#about">About</a>
-      <a href="#contact">Contact</a>
+      <a class="mobile" href="#/">‹ Map</a>
+      <a href="#/">‹ Map</a>
       <a class="btn btn-outline btn-sm" href="Samesun_Singh_CV_EN.pdf" download>CV</a>
     </nav>
   </div></header>`;
@@ -55,128 +49,213 @@ function header() {
 function footer() {
   return `<footer><div class="wrap foot">
     <p>${esc(PROFILE.name)} · ${esc(PROFILE.location)}</p>
-    <p>Every public GitHub repo, rewritten — plus the closed one, named only.</p>
+    <p>A living map of every public GitHub repo — plus the closed one, named only.</p>
   </div></footer>`;
 }
 
-function card(p) {
-  const gh = p.github
-    ? `<a href="${esc(p.github)}" target="_blank" rel="noopener">GitHub</a>`
-    : p.private
-      ? `<span class="muted">Private repo</span>`
-      : p.paper
-        ? `<a href="${esc(p.paper)}" target="_blank" rel="noopener">Paper</a>`
-        : "";
-  return `<article class="card">
-    <div class="card-meta"><span>${esc(p.category)}</span><span>${p.private ? "Private · " : ""}${esc(p.year)}</span></div>
-    <h3><a href="#/work/${esc(p.slug)}">${esc(p.title)}</a></h3>
-    <p class="blurb">${esc(p.blurb)}</p>
-    <p class="delta"><span class="lbl">New · </span>${esc(p.whatsNew[0] || "")}</p>
-    <div class="tags">${(p.tags || []).slice(0, 3).map((t) => `<span class="tag">${esc(t)}</span>`).join("")}</div>
-    <div class="card-links">
-      <a class="arch" href="#/work/${esc(p.slug)}">Architecture</a>
-      ${gh}
-    </div>
-  </article>`;
+function archHtml(p) {
+  return `<div class="arch-box"><div class="arch-rail" aria-hidden="true"><span class="arch-token"></span></div><div class="arch">${p.arch.map((s, i) => `<div class="arch-step"><div class="n">${String(i + 1).padStart(2, "0")}</div><div class="t">${esc(s.title)}</div><div class="s">${esc(s.sub)}</div></div>`).join("")}</div></div>`;
 }
 
 function home() {
-  const vis = visible();
-  const labList = labs();
-  return `<main>
-    <section class="hero wrap">
-      <div class="hero-grid">
-        <div>
-          <p class="kicker">Available for data / AI roles · ${esc(PROFILE.location)}</p>
-          <h1>Building systems<br>that <em>learn in production.</em></h1>
-          <p class="lede">${esc(PROFILE.name)} — ${esc(PROFILE.role)} at ${esc(PROFILE.school)}. Cold-start news ranking, a 7,800-call fairness audit, and ten original labs on the modern DS/AI stack.</p>
-          <div class="actions">
-            <a class="btn btn-primary" href="#labs">Orbit the labs</a>
-            <a class="btn btn-outline" href="${esc(PROFILE.github)}" target="_blank" rel="noopener">${ICON.gh} GitHub</a>
-            <a class="btn btn-ghost" href="Samesun_Singh_CV_EN.pdf" download>Download CV</a>
-          </div>
-        </div>
-        <div class="scene" data-kind="constellation">
-          <div class="scene-host"></div>
-          <p class="scene-cap">Drag to orbit · click a node</p>
-        </div>
+  return `<div class="map-stage">
+    <div id="map-host" class="map-host"></div>
+    <header class="map-hud">
+      <div class="map-id">
+        <p class="kicker">${esc(PROFILE.name)}</p>
+        <p class="here">you are here · <span id="map-area">Origin</span></p>
+        <h1 id="map-copy">Building systems<br>that <em>learn in production.</em></h1>
       </div>
-      <dl class="stats">
-        <div class="stat"><dt>Public GitHub repos</dt><dd>${publicCount()}</dd></div>
-        <div class="stat"><dt>DS/AI labs</dt><dd>${labList.length}</dd></div>
-        <div class="stat"><dt>LLM audit calls</dt><dd>7,800</dd></div>
-        <div class="stat"><dt>Stellantis logs</dt><dd>1M+</dd></div>
-      </dl>
-    </section>
-
-    <section id="about" class="section"><div class="wrap section-grid">
-      <div><h2>About</h2><p class="muted mt-3">Italian and English. Messy data on purpose.</p></div>
-      <div>
-        <p>${esc(PROFILE.summary)}</p>
-        <div class="skills mt-8">${skillGroups.map((g) => `<div><p class="kicker">${esc(g.group)}</p><p class="muted mt-2">${esc(g.items.join(" · "))}</p></div>`).join("")}</div>
-        <p class="kicker mt-8">Languages</p>
-        <p class="muted mt-2">${languages.map((l) => `${esc(l.name)} ${esc(l.level)}`).join(" · ")}</p>
-      </div>
-    </div></section>
-
-    <section id="experience" class="section"><div class="wrap section-grid">
-      <div><h2>Experience</h2><p class="muted mt-3">Industry labs, then a product thesis.</p></div>
-      <div>
-        ${experience.map((job) => `<article class="job">
-          <p class="muted" style="font-family:var(--font-mono);font-size:0.75rem">${esc(job.dates)} · ${esc(job.place)}</p>
-          <h3 class="mt-2">${esc(job.role)} <span class="muted">· ${esc(job.org)}</span></h3>
-          <ul>${job.points.map((pt) => `<li>${esc(pt)}</li>`).join("")}</ul>
-          <a class="link-primary" href="#/work/${esc(job.slug)}">Open project</a>
-        </article>`).join("")}
-        <h3>Education</h3>
-        <ul style="list-style:none;padding:0;margin:1rem 0 0">
-          ${education.map((ed) => `<li style="margin-bottom:1rem"><p style="font-weight:500">${esc(ed.title)}</p><p class="muted" style="font-size:0.875rem">${esc(ed.place)} · ${esc(ed.dates)} · ${esc(ed.note)}</p></li>`).join("")}
-        </ul>
-      </div>
-    </div></section>
-
-    <section id="labs" class="section"><div class="wrap">
-      <p class="kicker">Ten DS / AI labs</p>
-      <h2 class="mt-2">Stacks, rebuilt with my data.</h2>
-      <p class="muted mt-3" style="max-width:36rem">LangGraph, RAG, Promptfoo, Unsloth, MCP, Gemini, Qdrant, OpenHands, Made-With-ML, Microsoft Recommenders — each is an original public repo on my GitHub, not a silent fork. Architecture plus a 3D model on every page.</p>
-      <div class="labs-list">${labList.map((lab) => `<a class="lab-row" href="#/work/${esc(lab.slug)}"><span><h3>${esc(lab.title)}</h3><p>${esc(lab.tags.join(" · "))}</p></span></a>`).join("")}</div>
-    </div></section>
-
-    <section id="work" class="section"><div class="wrap">
-      <h2>All work</h2>
-      <p class="muted mt-3" style="max-width:36rem">Original research, industrial ML, and the ten labs. Every card has a 2026 delta, an architecture view, and a 3D scene.</p>
-      <p class="muted mt-2" style="font-family:var(--font-mono);font-size:0.75rem">${projects.length} entries in the catalog</p>
-      <div class="filters mt-8" id="filters">${CATS.map((c) => {
-        const n = c === "All" ? projects.length : c === "Labs" ? labs().length : projects.filter((p) => p.category === c).length;
-        return `<button type="button" class="filter${c === filter ? " active" : ""}" data-cat="${c}">${c}<span class="n">${n}</span></button>`;
-      }).join("")}</div>
-      <div class="grid" id="cards">${vis.map(card).join("")}</div>
-    </div></section>
-
-    <section id="contact" class="section"><div class="wrap">
-      <h2>Contact</h2>
-      <p class="muted mt-3" style="max-width:28rem">Torino. Open to data science, ML engineering, and applied LLM roles.</p>
-      <div class="contact-list">
-        <a href="mailto:${esc(PROFILE.email)}">${ICON.mail}${esc(PROFILE.email)}</a>
-        <a href="tel:${esc(PROFILE.phone.replace(/\s/g, ""))}">${ICON.phone}${esc(PROFILE.phone)}</a>
-        <a href="https://maps.google.com/?q=${encodeURIComponent(PROFILE.address)}" target="_blank" rel="noopener">${ICON.pin}${esc(PROFILE.address)}</a>
-        <a href="${esc(PROFILE.linkedin)}" target="_blank" rel="noopener">${ICON.in}LinkedIn</a>
-        <a href="${esc(PROFILE.github)}" target="_blank" rel="noopener">${ICON.gh}GitHub</a>
-      </div>
-    </div></section>
-  </main>`;
+      <nav>
+        <button type="button" class="hud-btn" id="btn-map">Map</button>
+        <a class="hud-btn" href="Samesun_Singh_CV_EN.pdf" download>CV</a>
+      </nav>
+    </header>
+    <p class="map-hint" id="map-hint">click a ring to explore · click a project to preview</p>
+    <button type="button" class="map-back" id="btn-back" hidden>‹ Back to map</button>
+    <aside class="map-sheet" id="map-sheet" hidden></aside>
+  </div>`;
 }
 
-function visible() {
-  if (filter === "All") return projects;
-  if (filter === "Labs") return labs();
-  return projects.filter((p) => p.category === filter);
+function sheetChrome(title, body) {
+  return `<div class="sheet-bar"><p class="kicker">${esc(title)}</p><button type="button" class="icon-x" id="sheet-close" aria-label="Close">×</button></div><div class="sheet-body">${body}</div>`;
+}
+
+function originBody() {
+  return `<h2>Building systems that <em>learn in production.</em></h2>
+    <p class="muted mt-4">${esc(PROFILE.summary)}</p>
+    <div class="skills mt-8">${skillGroups.map((g) => `<div><p class="kicker">${esc(g.group)}</p><p class="muted mt-2">${esc(g.items.join(" · "))}</p></div>`).join("")}</div>
+    <p class="muted mt-8">${languages.map((l) => `${esc(l.name)} ${esc(l.level)}`).join(" · ")}</p>`;
+}
+
+function experienceBody() {
+  return experience.map((job) => `<article class="mt-8">
+      <p class="muted" style="font-family:var(--font-mono);font-size:0.75rem">${esc(job.dates)} · ${esc(job.place)}</p>
+      <h3 class="mt-2">${esc(job.role)} <span class="muted">· ${esc(job.org)}</span></h3>
+      <ul class="muted mt-3">${job.points.map((pt) => `<li>${esc(pt)}</li>`).join("")}</ul>
+      <a class="btn-link" href="#/work/${esc(job.slug)}">Open project</a>
+    </article>`).join("") +
+    `<div class="mt-8"><h3>Education</h3><ul class="mt-4">${education.map((ed) => `<li class="mt-4"><p style="font-weight:500">${esc(ed.title)}</p><p class="muted">${esc(ed.place)} · ${esc(ed.dates)} · ${esc(ed.note)}</p></li>`).join("")}</ul></div>`;
+}
+
+function contactBody() {
+  return `<ul class="contact-list">
+    <li><a href="mailto:${esc(PROFILE.email)}">${ICON.mail}${esc(PROFILE.email)}</a></li>
+    <li><a href="tel:${esc(PROFILE.phone.replace(/\s/g, ""))}">${ICON.phone}${esc(PROFILE.phone)}</a></li>
+    <li><a href="https://maps.google.com/?q=${encodeURIComponent(PROFILE.address)}" target="_blank" rel="noopener">${ICON.pin}${esc(PROFILE.address)}</a></li>
+    <li><a href="${esc(PROFILE.linkedin)}" target="_blank" rel="noopener">${ICON.in}LinkedIn</a></li>
+    <li><a href="${esc(PROFILE.github)}" target="_blank" rel="noopener">${ICON.gh}GitHub</a></li>
+  </ul>`;
+}
+
+function sitemapBody() {
+  const labList = labs();
+  const featured = projects.filter((p) => p.featured && !p.lab);
+  return `<p class="muted">estás aquí — a living map of the work.</p>
+    <ul class="sitemap">
+      <li><button type="button" class="map-go" data-area="origin">Origin${currentArea === "origin" ? ' <span class="here-tag">you are here</span>' : ""}</button></li>
+      <li><button type="button" class="map-go" data-area="labs">Labs${currentArea === "labs" ? ' <span class="here-tag">you are here</span>' : ""}</button>
+        <ul>${labList.map((p) => `<li><button type="button" class="map-proj" data-slug="${esc(p.slug)}">${esc(p.title)}</button></li>`).join("")}</ul>
+      </li>
+      <li><button type="button" class="map-go" data-area="work">Work${currentArea === "work" ? ' <span class="here-tag">you are here</span>' : ""}</button>
+        <ul>${featured.map((p) => `<li><button type="button" class="map-proj" data-slug="${esc(p.slug)}">${esc(p.title)}</button></li>`).join("")}</ul>
+      </li>
+      <li><button type="button" class="map-go" data-area="experience">Experience${currentArea === "experience" ? ' <span class="here-tag">you are here</span>' : ""}</button></li>
+      <li><button type="button" class="map-go" data-area="contact">Contact${currentArea === "contact" ? ' <span class="here-tag">you are here</span>' : ""}</button></li>
+    </ul>`;
+}
+
+function previewBody(p) {
+  const gh = p.github
+    ? `<a class="btn btn-primary" href="${esc(p.github)}" target="_blank" rel="noopener">${ICON.gh} GitHub</a>`
+    : "";
+  return `<h2>${esc(p.title)}</h2>
+    <p class="muted mt-3">${esc(p.blurb)}</p>
+    <div class="mt-5">${archHtml(p)}</div>
+    <div class="tags mt-5">${(p.tags || []).map((t) => `<span class="tag">${esc(t)}</span>`).join("")}</div>
+    <div class="actions mt-5">${gh}<a class="btn btn-outline" href="#/work/${esc(p.slug)}">Open project</a></div>`;
+}
+
+function closeSheet() {
+  const sheet = document.getElementById("map-sheet");
+  if (sheet) {
+    sheet.hidden = true;
+    sheet.innerHTML = "";
+  }
+}
+
+function openSheet(title, body) {
+  const sheet = document.getElementById("map-sheet");
+  if (!sheet) return;
+  sheet.hidden = false;
+  sheet.innerHTML = sheetChrome(title, body);
+  document.getElementById("sheet-close")?.addEventListener("click", closeSheet);
+  sheet.querySelectorAll(".map-go").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const id = btn.getAttribute("data-area");
+      closeSheet();
+      mapHandle?.flyToArea(id);
+      if (id === "origin") openSheet("Origin", originBody());
+      if (id === "experience") openSheet("Experience", experienceBody());
+      if (id === "contact") openSheet("Contact", contactBody());
+    });
+  });
+  sheet.querySelectorAll(".map-proj").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const slug = btn.getAttribute("data-slug");
+      const p = projects.find((x) => x.slug === slug);
+      if (p) openSheet(p.lab ? "Lab · " + p.category : p.category, previewBody(p));
+    });
+  });
+}
+
+function setAreaLabel(id) {
+  currentArea = id;
+  const names = { origin: "Origin", labs: "Labs", work: "Work", experience: "Experience", contact: "Contact" };
+  const copies = {
+    origin: "Building systems<br>that <em>learn in production.</em>",
+    labs: "LangGraph, RAG, evals, LoRA, MCP — rebuilt with my data.",
+    work: "Cold-start ranking, a 7,800-call audit, egocentric vision.",
+    experience: "Column news, Stellantis, Molinette.",
+    contact: "Open to data and AI roles.",
+  };
+  const areaEl = document.getElementById("map-area");
+  const copyEl = document.getElementById("map-copy");
+  const back = document.getElementById("btn-back");
+  if (areaEl) areaEl.textContent = names[id] || id;
+  if (copyEl) {
+    if (id === "origin") copyEl.innerHTML = copies.origin;
+    else {
+      copyEl.className = "map-copy-sub";
+      copyEl.textContent = copies[id] || "";
+    }
+    if (id === "origin") copyEl.className = "";
+  }
+  if (back) back.hidden = id === "origin";
+}
+
+function bindMap() {
+  if (mapHandle) {
+    mapHandle.dispose();
+    mapHandle = null;
+  }
+  const host = document.getElementById("map-host");
+  if (!host) return;
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  document.body.style.overflow = "hidden";
+  try {
+    mapHandle = mountLivingMap(host, {
+      reducedMotion: reduced,
+      onAreaChange: setAreaLabel,
+      onHover: (pick) => {
+        const hint = document.getElementById("map-hint");
+        if (!hint) return;
+        hint.textContent = pick?.type === "node" ? pick.label : pick?.type === "area" ? pick.id : "click a ring to explore · click a project to preview";
+      },
+      onPick: (pick) => {
+        if (pick.type === "area") {
+          if (pick.id === "origin") openSheet("Origin", originBody());
+          else if (pick.id === "experience") openSheet("Experience", experienceBody());
+          else if (pick.id === "contact") openSheet("Contact", contactBody());
+          else closeSheet();
+          return;
+        }
+        if (pick.kind === "contact" && pick.href) {
+          if (pick.href.startsWith("/")) {
+            const a = document.createElement("a");
+            a.href = pick.href.replace(/^\//, "");
+            a.download = "";
+            a.click();
+          } else {
+            window.open(pick.href, pick.href.startsWith("mailto:") ? "_self" : "_blank", "noopener");
+          }
+          openSheet("Contact", contactBody());
+          return;
+        }
+        if (pick.kind === "edu") {
+          openSheet("Experience", experienceBody());
+          return;
+        }
+        if (pick.slug) {
+          const p = projects.find((x) => x.slug === pick.slug);
+          if (p) openSheet(p.lab ? "Lab · " + p.category : p.category, previewBody(p));
+        }
+      },
+    });
+  } catch (err) {
+    console.error(err);
+  }
+  document.getElementById("btn-map")?.addEventListener("click", () => openSheet("Site map", sitemapBody()));
+  document.getElementById("btn-back")?.addEventListener("click", () => {
+    closeSheet();
+    mapHandle?.reset();
+  });
 }
 
 function projectPage(slug) {
   const p = projects.find((x) => x.slug === slug);
   if (!p) {
-    return `<main class="detail wrap"><h1>Project not found</h1><p class="muted mt-3">That slug is not in the catalog.</p><a class="btn btn-primary mt-8" href="#/">Back to work</a></main>`;
+    return `<main class="detail wrap"><h1>Project not found</h1><p class="muted mt-3">That slug is not in the catalog.</p><a class="btn btn-primary mt-8" href="#/">‹ Back to map</a></main>`;
   }
   const related = projects.filter((x) => x.category === p.category && x.slug !== p.slug).slice(0, 3);
   const gh = p.github
@@ -191,7 +270,7 @@ function projectPage(slug) {
     ? `<a class="btn btn-outline" href="${esc(p.paper)}" target="_blank" rel="noopener">ResearchGate</a>`
     : "";
   return `<main class="detail wrap">
-    <a class="back" href="#work">All work</a>
+    <a class="back" href="#/">‹ Back to map</a>
     <div class="detail-grid">
       <div>
         <p class="kicker">${p.lab ? "Lab · " : ""}${esc(p.category)}${p.language ? " · " + esc(p.language) : ""} · ${esc(p.year)}${p.private ? " · Private" : ""}</p>
@@ -213,7 +292,7 @@ function projectPage(slug) {
     <section class="mt-8">
       <h2>Architecture</h2>
       <p class="muted mt-2" style="font-size:0.875rem">Pipeline as shipped — a packet moving through each stage.</p>
-      <div class="arch-box"><div class="arch-rail" aria-hidden="true"><span class="arch-token"></span></div><div class="arch">${p.arch.map((s, i) => `<div class="arch-step"><div class="n">${String(i + 1).padStart(2, "0")}</div><div class="t">${esc(s.title)}</div><div class="s">${esc(s.sub)}</div></div>`).join("")}</div></div>
+      ${archHtml(p)}
     </section>
     <section class="split">
       <div>
@@ -260,29 +339,26 @@ function route() {
   const hash = location.hash || "";
   const work = hash.match(/^#\/work\/([^/?]+)/);
   const root = document.getElementById("root");
+  if (mapHandle) {
+    mapHandle.dispose();
+    mapHandle = null;
+  }
+  document.body.style.overflow = "";
   if (work) {
     root.innerHTML = header() + projectPage(decodeURIComponent(work[1])) + footer();
     bindScenes();
     window.scrollTo(0, 0);
     return;
   }
-  root.innerHTML = header() + home() + footer();
-  bindScenes();
-  const filters = document.getElementById("filters");
-  filters?.addEventListener("click", (e) => {
-    const btn = e.target.closest("[data-cat]");
-    if (!btn) return;
-    filter = btn.getAttribute("data-cat");
-    document.getElementById("cards").innerHTML = visible().map(card).join("");
-    filters.querySelectorAll(".filter").forEach((el) => {
-      el.classList.toggle("active", el.getAttribute("data-cat") === filter);
-    });
-  });
-  const section = hash.replace(/^#/, "");
-  if (section && !section.startsWith("/")) {
-    document.getElementById(section)?.scrollIntoView();
-  }
+  root.innerHTML = home();
+  bindMap();
 }
 
 window.addEventListener("hashchange", route);
+window.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    closeSheet();
+    mapHandle?.reset();
+  }
+});
 route();

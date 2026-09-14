@@ -1,11 +1,11 @@
 :root {
-  --bg: #f3efe6;
-  --surface: #fffcf6;
-  --fg: #1a1f1c;
-  --muted: #5d6660;
-  --primary: #0e7d66;
-  --primary-fg: #f3efe6;
-  --border: #d8d0c3;
+  --bg: #0c1211;
+  --surface: #151c1a;
+  --fg: #e7eee9;
+  --muted: #8b9790;
+  --primary: #3dcfb0;
+  --primary-fg: #0c1211;
+  --border: #2a3531;
   --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Fraunces", "Times New Roman", serif;
   --font-mono: "IBM Plex Mono", ui-monospace, monospace;

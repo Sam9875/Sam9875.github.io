@@ -4,14 +4,14 @@ var PROFILE = {
   role: "Data Science & Engineering",
   school: "Politecnico di Torino",
   location: "Torino, Italy",
-  address: "Via Melezet 13, Torino",
+  address: "Via Melezet, 13, Torino",
   email: "samesun987@gmail.com",
   phone: "+39 347 665 7332",
   github: "https://github.com/Sam9875",
   linkedin: "https://www.linkedin.com/in/samesun-singh-979a86275/",
   researchgate: "https://www.researchgate.net/profile/Samesun-Singh",
   site: "https://sam9875.github.io",
-  summary: "Master\u2019s student in Data Science and Engineering at Politecnico di Torino, where I also completed my Bachelor\u2019s. Strong in Python and SQL. Comfortable in international teams \u2014 Italian and English. Motivated by messy, real-world data problems: sparse recommenders, fairness audits, and industrial logs."
+  summary: "Master\u2019s student in Data Science and Engineering at Politecnico di Torino, where I also completed my Bachelor\u2019s. Strong foundation in Python and SQL, with solid analytical and problem-solving skills. Comfortable in international environments \u2014 Italian and English. Motivated to apply my skills to real-world, data-driven challenges."
 };
 var experience = [
   {
@@ -20,9 +20,9 @@ var experience = [
     dates: "Mar 2026 \u2014 Present",
     place: "Torino",
     points: [
-      "Cold-start recommender for new users and items on a live news product.",
-      "Two-tower retrieval plus ranking heads (v3 / v4) on sparse click logs.",
-      "Public training stand-in: Microsoft MIND Large, then a product demo feed."
+      "Developing a recommender for the cold-start problem on new users and items, training and iterating on AWS SageMaker.",
+      "Researching machine learning techniques for personalized recommendations in sparse-data environments.",
+      "Working with user\u2013item interaction datasets to analyse recommendation patterns and system performance."
     ],
     slug: "two-tower-thesis"
   },
@@ -32,9 +32,9 @@ var experience = [
     dates: "Sep 2025 \u2014 Jan 2026",
     place: "Torino",
     points: [
-      "Breakdown-risk models on 1M+ service logs, warranty claims, and sensor signals.",
-      "Automated cleaning and feature pipelines; CatBoost vs LightGBM vs Random Forests.",
-      "Temporal splits and calibration so garage-time leakage does not inflate PR-AUC."
+      "Designed and implemented an ML solution to predict vehicle breakdown risk using 1M+ service logs, warranty claims, and sensor signals.",
+      "Built automated data-cleaning and feature-engineering pipelines.",
+      "Trained and compared CatBoost, LightGBM, and Random Forests."
     ],
     slug: "stellantis"
   }
@@ -60,12 +60,20 @@ var education = [
   }
 ];
 var skillGroups = [
-  { group: "Languages", items: ["Python", "SQL", "Java", "C", "C++"] },
-  { group: "Data", items: ["Hadoop", "Spark", "Pandas", "NumPy"] },
-  { group: "ML", items: ["scikit-learn", "XGBoost", "SHAP", "CatBoost", "LightGBM"] },
-  { group: "LLM", items: ["RAG", "LangChain", "LangGraph", "evals"] },
-  { group: "Stores", items: ["SQL Server", "Oracle PL/SQL"] },
-  { group: "Ops", items: ["Git", "Docker", "Agile"] }
+  { group: "Programming", items: ["Python", "SQL", "Java"] },
+  { group: "Big Data", items: ["Hadoop", "Apache Spark"] },
+  { group: "ML tools", items: ["scikit-learn", "Pandas", "NumPy", "Matplotlib", "XGBoost", "SHAP", "Jupyter", "RAG", "LangChain", "LangGraph", "Guardrails"] },
+  { group: "Cloud", items: ["AWS SageMaker", "Google Cloud"] },
+  { group: "Databases", items: ["Microsoft SQL Server", "Oracle PL/SQL"] },
+  { group: "Other", items: ["Git", "Docker", "Agile", "Office 365"] }
+];
+var publications = [
+  {
+    title: "Microkernel vs. Monolithic OS",
+    dates: "Dec 2023",
+    note: "Impact of OS architectures on functional safety, reliability, and fault tolerance in safety-critical systems.",
+    href: "https://www.researchgate.net/profile/Samesun-Singh"
+  }
 ];
 var languages = [
   { name: "English", level: "C2" },
@@ -925,5 +933,6 @@ export {
   languages,
   projectBySlug,
   projects,
+  publications,
   skillGroups
 };

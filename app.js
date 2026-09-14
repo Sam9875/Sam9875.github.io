@@ -3,6 +3,7 @@ import {
   education,
   experience,
   languages,
+  publications,
   projects,
   skillGroups,
 } from "./data.js";
@@ -96,7 +97,8 @@ function experienceBody() {
       <ul class="muted mt-3">${job.points.map((pt) => `<li>${esc(pt)}</li>`).join("")}</ul>
       <a class="btn-link" href="#/work/${esc(job.slug)}">Open project</a>
     </article>`).join("") +
-    `<div class="mt-8"><h3>Education</h3><ul class="mt-4">${education.map((ed) => `<li class="mt-4"><p style="font-weight:500">${esc(ed.title)}</p><p class="muted">${esc(ed.place)} · ${esc(ed.dates)} · ${esc(ed.note)}</p></li>`).join("")}</ul></div>`;
+    `<div class="mt-8"><h3>Education</h3><ul class="mt-4">${education.map((ed) => `<li class="mt-4"><p style="font-weight:500">${esc(ed.title)}</p><p class="muted">${esc(ed.place)} · ${esc(ed.dates)} · ${esc(ed.note)}</p></li>`).join("")}</ul></div>` +
+    `<div class="mt-8"><h3>Publication</h3><ul class="mt-4">${publications.map((pub) => `<li class="mt-4"><p style="font-weight:500">${esc(pub.title)}</p><p class="muted">${esc(pub.dates)} · ${esc(pub.note)}</p><a class="btn-link" href="${esc(pub.href)}" target="_blank" rel="noopener">ResearchGate</a></li>`).join("")}</ul></div>`;
 }
 
 function contactBody() {
@@ -208,7 +210,7 @@ function bindMap() {
     closeSheet();
     mapHandle?.reset();
   });
-  import("./living-map.js?v=20260914k")
+  import("./living-map.js?v=20260914l")
     .then((mod) => {
       if (!document.getElementById("map-host")) return;
       mapHandle = mod.mountLivingMap(host, {
@@ -327,7 +329,7 @@ function bindScenes() {
   const kind = box.getAttribute("data-kind") || "constellation";
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const nodes = labs().map((p) => ({ slug: p.slug, title: p.title, kind: p.scene }));
-  import("./engine.js?v=20260914k")
+  import("./engine.js?v=20260914l")
     .then((mod) => {
       sceneDispose = mod.mountScene(host, {
         kind,

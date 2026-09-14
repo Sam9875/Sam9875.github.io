@@ -13,6 +13,7 @@ const ICON = {
   phone: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.6a2 2 0 0 1-.4 2.1L8 9.9a16 16 0 0 0 6 6l1.4-1.3a2 2 0 0 1 2.1-.4c.8.3 1.7.5 2.6.6a2 2 0 0 1 1.7 2.1z"/></svg>',
   pin: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>',
   in: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>',
+  rg: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>',
 };
 
 let sceneDispose = null;
@@ -104,6 +105,7 @@ function contactBody() {
     <li><a href="tel:${esc(PROFILE.phone.replace(/\s/g, ""))}">${ICON.phone}${esc(PROFILE.phone)}</a></li>
     <li><a href="https://maps.google.com/?q=${encodeURIComponent(PROFILE.address)}" target="_blank" rel="noopener">${ICON.pin}${esc(PROFILE.address)}</a></li>
     <li><a href="${esc(PROFILE.linkedin)}" target="_blank" rel="noopener">${ICON.in}LinkedIn</a></li>
+    <li><a href="${esc(PROFILE.researchgate)}" target="_blank" rel="noopener">${ICON.rg}ResearchGate</a></li>
     <li><a href="${esc(PROFILE.github)}" target="_blank" rel="noopener">${ICON.gh}GitHub</a></li>
   </ul>`;
 }
@@ -208,7 +210,7 @@ function bindMap() {
     closeSheet();
     mapHandle?.reset();
   });
-  import("./living-map.js?v=20260914h")
+  import("./living-map.js?v=20260914i")
     .then((mod) => {
       if (!document.getElementById("map-host")) return;
       mapHandle = mod.mountLivingMap(host, {
@@ -327,7 +329,7 @@ function bindScenes() {
   const kind = box.getAttribute("data-kind") || "constellation";
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const nodes = labs().map((p) => ({ slug: p.slug, title: p.title, kind: p.scene }));
-  import("./engine.js?v=20260914h")
+  import("./engine.js?v=20260914i")
     .then((mod) => {
       sceneDispose = mod.mountScene(host, {
         kind,

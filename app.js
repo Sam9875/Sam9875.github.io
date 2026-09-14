@@ -1,5 +1,3 @@
-import { mountScene } from "./engine.js?v=20260914a";
-import { mountLivingMap } from "./living-map.js?v=20260914a";
 import {
   PROFILE,
   education,
@@ -60,6 +58,7 @@ function archHtml(p) {
 function home() {
   return `<div class="map-stage">
     <div id="map-host" class="map-host"></div>
+    <p class="map-loading" id="map-loading">drawing the map…</p>
     <header class="map-hud">
       <div class="map-id">
         <p class="kicker">${esc(PROFILE.name)}</p>
@@ -203,53 +202,59 @@ function bindMap() {
   if (!host) return;
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   document.body.style.overflow = "hidden";
-  try {
-    mapHandle = mountLivingMap(host, {
-      reducedMotion: reduced,
-      onAreaChange: setAreaLabel,
-      onHover: (pick) => {
-        const hint = document.getElementById("map-hint");
-        if (!hint) return;
-        hint.textContent = pick?.type === "node" ? pick.label : pick?.type === "area" ? pick.id : "click a ring to explore · click a project to preview";
-      },
-      onPick: (pick) => {
-        if (pick.type === "area") {
-          if (pick.id === "origin") openSheet("Origin", originBody());
-          else if (pick.id === "experience") openSheet("Experience", experienceBody());
-          else if (pick.id === "contact") openSheet("Contact", contactBody());
-          else closeSheet();
-          return;
-        }
-        if (pick.kind === "contact" && pick.href) {
-          if (pick.href.startsWith("/")) {
-            const a = document.createElement("a");
-            a.href = pick.href.replace(/^\//, "");
-            a.download = "";
-            a.click();
-          } else {
-            window.open(pick.href, pick.href.startsWith("mailto:") ? "_self" : "_blank", "noopener");
-          }
-          openSheet("Contact", contactBody());
-          return;
-        }
-        if (pick.kind === "edu") {
-          openSheet("Experience", experienceBody());
-          return;
-        }
-        if (pick.slug) {
-          const p = projects.find((x) => x.slug === pick.slug);
-          if (p) openSheet(p.lab ? "Lab · " + p.category : p.category, previewBody(p));
-        }
-      },
-    });
-  } catch (err) {
-    console.error(err);
-  }
   document.getElementById("btn-map")?.addEventListener("click", () => openSheet("Site map", sitemapBody()));
   document.getElementById("btn-back")?.addEventListener("click", () => {
     closeSheet();
     mapHandle?.reset();
   });
+  import("./living-map.js?v=20260914b")
+    .then((mod) => {
+      if (!document.getElementById("map-host")) return;
+      mapHandle = mod.mountLivingMap(host, {
+        reducedMotion: reduced,
+        onAreaChange: setAreaLabel,
+        onHover: (pick) => {
+          const hint = document.getElementById("map-hint");
+          if (!hint) return;
+          hint.textContent = pick?.type === "node" ? pick.label : pick?.type === "area" ? pick.id : "click a ring to explore · click a project to preview";
+        },
+        onPick: (pick) => {
+          if (pick.type === "area") {
+            if (pick.id === "origin") openSheet("Origin", originBody());
+            else if (pick.id === "experience") openSheet("Experience", experienceBody());
+            else if (pick.id === "contact") openSheet("Contact", contactBody());
+            else closeSheet();
+            return;
+          }
+          if (pick.kind === "contact" && pick.href) {
+            if (pick.href.startsWith("/")) {
+              const a = document.createElement("a");
+              a.href = pick.href.replace(/^\//, "");
+              a.download = "";
+              a.click();
+            } else {
+              window.open(pick.href, pick.href.startsWith("mailto:") ? "_self" : "_blank", "noopener");
+            }
+            openSheet("Contact", contactBody());
+            return;
+          }
+          if (pick.kind === "edu") {
+            openSheet("Experience", experienceBody());
+            return;
+          }
+          if (pick.slug) {
+            const p = projects.find((x) => x.slug === pick.slug);
+            if (p) openSheet(p.lab ? "Lab · " + p.category : p.category, previewBody(p));
+          }
+        },
+      });
+      document.getElementById("map-loading")?.remove();
+    })
+    .catch((err) => {
+      console.error(err);
+      const load = document.getElementById("map-loading");
+      if (load) load.textContent = "Map failed to load — use Map for the index.";
+    });
 }
 
 function projectPage(slug) {
@@ -321,18 +326,18 @@ function bindScenes() {
   const kind = box.getAttribute("data-kind") || "constellation";
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const nodes = labs().map((p) => ({ slug: p.slug, title: p.title, kind: p.scene }));
-  try {
-    sceneDispose = mountScene(host, {
-      kind,
-      nodes,
-      reducedMotion: reduced,
-      onSelect: (slug) => {
-        location.hash = `#/work/${slug}`;
-      },
-    });
-  } catch (err) {
-    console.error(err);
-  }
+  import("./engine.js?v=20260914b")
+    .then((mod) => {
+      sceneDispose = mod.mountScene(host, {
+        kind,
+        nodes,
+        reducedMotion: reduced,
+        onSelect: (slug) => {
+          location.hash = `#/work/${slug}`;
+        },
+      });
+    })
+    .catch((err) => console.error(err));
 }
 
 function route() {

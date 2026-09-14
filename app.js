@@ -210,7 +210,7 @@ function bindMap() {
     closeSheet();
     mapHandle?.reset();
   });
-  import("./living-map.js?v=20260914i")
+  import("./living-map.js?v=20260914j")
     .then((mod) => {
       if (!document.getElementById("map-host")) return;
       mapHandle = mod.mountLivingMap(host, {
@@ -329,7 +329,7 @@ function bindScenes() {
   const kind = box.getAttribute("data-kind") || "constellation";
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const nodes = labs().map((p) => ({ slug: p.slug, title: p.title, kind: p.scene }));
-  import("./engine.js?v=20260914i")
+  import("./engine.js?v=20260914j")
     .then((mod) => {
       sceneDispose = mod.mountScene(host, {
         kind,
